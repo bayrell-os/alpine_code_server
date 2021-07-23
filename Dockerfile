@@ -1,8 +1,9 @@
 ARG ARCH=
-FROM docker.io/bayrell/alpine_php_fpm:7.4-1${ARCH}
+FROM docker.io/bayrell/alpine_php_fpm:7.4-4${ARCH}
 
 ENV GOROOT /usr/lib/go
 ENV GOPATH /data/golang
+ENV GO111MODULE auto
 
 RUN cd ~; \
 	apk update; \
@@ -13,11 +14,12 @@ RUN cd ~; \
 	npm install -g @vue/cli; \
 	echo 'Ok'
 
-ADD files /src
+ADD files /src/files
 ADD downloads /src/downloads
 RUN cd /src/downloads; \
 	tar -xzf code-server-3.11.0-linux-amd64.tar.gz; \
 	cp -r code-server-3.11.0-linux-amd64 /usr/lib/code-server; \
+	sed -i 's|$ROOT/lib/node|/usr/bin/node|g' /usr/lib/code-server/bin/code-server; \
 	cp -rf /src/files/etc/* /etc/; \
 	cp -rf /src/files/root/* /root/; \
 	rm -rf /src/*; \
